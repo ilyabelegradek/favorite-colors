@@ -1,0 +1,41 @@
+# Build artifacts
+.gradle/
+build/
+app/build/
+
+# Local configuration
+/local.properties
+
+# IDE files (IntelliJ/Android Studio)
+*.iml
+.idea/
+/out/
+.navigation/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Captures
+/captures
+
+# Native build
+.externalNativeBuild/
+.cxx/
+
+# Kotlin
+.kotlin/
+
+# Keystores & Secrets
+*.jks
+*.keystore
+secrets.properties
+google-services.json
+
+# Log Files
+*.log
+
+# Build Outputs
+*.apk
+*.aar
+*.aab
