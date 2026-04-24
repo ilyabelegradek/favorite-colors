@@ -78,13 +78,18 @@ class FavoriteColorsViewModel : ViewModel() {
                 auth,
                 email = _colorsState.value.email,
                 password = _colorsState.value.password,
-                onSignupSuccess = { user ->
-                    if (user != null) {
+                onSignupSuccess = { firebaseUser ->
+                    if (firebaseUser != null) {
                         writeUser(
                             database,
-                            user,
+                            firebaseUser,
                             _colorsState.value.selectedColor,
-                            onSuccess = { toggleRegistrationDialog() },
+                            onSuccess = {
+                                getUser(database, firebaseUser, onUserLoaded = { fetchedUser ->
+                                    _colorsState.value = _colorsState.value.copy(user = fetchedUser)
+                                    toggleRegistrationDialog()
+                                })
+                            },
                             onFailure = { toggleRegistrationDialog() })
                     } else {
                         Log.w(TAG, "onSignupSuccess but user came back null.")
@@ -106,7 +111,16 @@ class FavoriteColorsViewModel : ViewModel() {
                 auth,
                 email = _colorsState.value.email,
                 password = _colorsState.value.password,
-                onLoginSuccess = { toggleRegistrationDialog() },
+                onLoginSuccess = { firebaseUser ->
+                    if (firebaseUser != null) {
+                        getUser(database, firebaseUser, onUserLoaded = { fetchedUser ->
+                            _colorsState.value = _colorsState.value.copy(user = fetchedUser)
+                            toggleRegistrationDialog()
+                        })
+                    } else {
+                        toggleRegistrationDialog()
+                    }
+                },
                 onLoginFailure = { errorMessage ->
                     _colorsState.value = _colorsState.value.copy(
                         authDialogError = true,
@@ -118,6 +132,7 @@ class FavoriteColorsViewModel : ViewModel() {
 
     fun logoutHandler() {
         auth.signOut()
+        _colorsState.value = _colorsState.value.copy(user = null)
     }
 
     private fun loadColors() {

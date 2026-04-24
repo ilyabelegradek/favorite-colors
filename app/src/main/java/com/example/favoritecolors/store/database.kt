@@ -9,67 +9,6 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
 
-//fun testWrite(database: DatabaseReference) {
-//    try {
-//        val colors = listOf(
-//            ColorToFavorite(color = "#12a4e3", displayName = "Sky Blue", favoriteCount = 0),
-//            ColorToFavorite(color = "#0000FF", displayName = "Blue", favoriteCount = 0),
-//            ColorToFavorite(
-//                color = "#5af542",
-//                displayName = "Neon Green",
-//                favoriteCount = 0,
-//                contrastColor = "#000000"
-//            ),
-//            ColorToFavorite(color = "#e3362d", displayName = "Red", favoriteCount = 0),
-//            ColorToFavorite(color = "#e3972d", displayName = "Orange", favoriteCount = 0),
-//            ColorToFavorite(
-//                color = "#e8d827",
-//                displayName = "Yellow",
-//                favoriteCount = 0,
-//                contrastColor = "#000000"
-//            ),
-//            ColorToFavorite(color = "#6815cf", displayName = "Purple", favoriteCount = 0),
-//            ColorToFavorite(color = "#eb17e7", displayName = "Pink", favoriteCount = 0),
-//            ColorToFavorite(color = "#000000", displayName = "Black", favoriteCount = 0),
-//            ColorToFavorite(
-//                color = "#FFFFFF",
-//                displayName = "White",
-//                favoriteCount = 0,
-//                contrastColor = "#e3362d"
-//            ),
-//        )
-//
-//        for (color in colors) {
-//            writeColor(database, color.color, color.displayName, color.contrastColor)
-//        }
-//    } catch (e: Exception) {
-//        Log.i("ZEBRA", "Error: $e")
-//    }
-//}
-//
-//fun writeColor(
-//    database: DatabaseReference,
-//    hexCode: String,
-//    colorName: String,
-//    contrastColor: String = ""
-//) {
-//    val key = database.child("colors").push().key
-//    val colorToWrite = ColorToFavorite(
-//        uid = key,
-//        color = hexCode,
-//        displayName = colorName,
-//        favoriteCount = 0,
-//        contrastColor = contrastColor
-//    )
-//
-//    val colorValues = colorToWrite.toMap()
-//    val childUpdates = hashMapOf<String, Any>(
-//        "/colors/$key" to colorValues,
-//    )
-//
-//    database.updateChildren(childUpdates)
-//}
-
 private const val TAG = "database.kt"
 
 fun getColorsFromDB(database: DatabaseReference, onColorsLoaded: (List<ColorToFavorite>) -> Unit) {
@@ -99,10 +38,8 @@ fun writeUser(
     onSuccess: () -> Unit,
     onFailure: () -> Unit
 ) {
-    //val key = database.child("users").push().key
     val newUser = User(
         uid = user.uid,
-        email = user.email,
         favoriteColor = selectedColor,
     )
 

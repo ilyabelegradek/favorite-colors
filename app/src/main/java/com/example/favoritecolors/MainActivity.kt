@@ -12,8 +12,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.favoritecolors.ui.screens.ColorGrid
-import com.example.favoritecolors.ui.screens.Explanation
+import com.example.favoritecolors.ui.screens.Content
 import com.example.favoritecolors.ui.theme.FavoriteColorsTheme
 
 class MainActivity : ComponentActivity() {
@@ -34,8 +33,7 @@ class MainActivity : ComponentActivity() {
                         .statusBarsPadding()
                 ) {
                     Column() {
-                        Explanation()
-                        ColorGrid()
+                        Content()
                     }
                 }
             }
