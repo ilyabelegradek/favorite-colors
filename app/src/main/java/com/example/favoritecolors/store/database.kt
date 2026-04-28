@@ -65,8 +65,43 @@ fun writeUser(
     }
 }
 
+fun updateUsersFavoriteColor(
+    database: DatabaseReference,
+    user: User,
+    selectedColor: ColorToFavorite,
+    onSuccess: () -> Unit,
+    onFailure: () -> Unit
+) {
+    val colorValues = selectedColor.toMap()
+    val childUpdates = hashMapOf<String, Any>("/users/${user.uid}/favoriteColor" to colorValues)
+    val oldFavoriteUid = user.favoriteColor?.uid
+    if (!oldFavoriteUid.isNullOrEmpty()) {
+        childUpdates["/colors/$oldFavoriteUid/favoriteCount"] = ServerValue.increment(-1.0)
+    }
+    val newFavoriteUid = selectedColor.uid
+    childUpdates["/colors/$newFavoriteUid/favoriteCount"] = ServerValue.increment(1.0)
+
+    database.updateChildren(childUpdates).addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            onSuccess()
+        } else {
+            Log.w("ZEBRA", "Error updating favorite color: " + task.exception)
+            onFailure()
+        }
+    }
+}
+
 fun getUser(database: DatabaseReference, user: FirebaseUser, onUserLoaded: (User?) -> Unit) {
     database.child("users").child(user.uid).get().addOnSuccessListener { user ->
+        val fetchedUser: User? = user.getValue(User::class.java)
+        onUserLoaded(fetchedUser)
+    }.addOnFailureListener {
+        Log.w(TAG, "Error getting user: ", it)
+    }
+}
+
+fun getUserById(database: DatabaseReference, uid: String, onUserLoaded: (User?) -> Unit) {
+    database.child("users").child(uid).get().addOnSuccessListener { user ->
         val fetchedUser: User? = user.getValue(User::class.java)
         onUserLoaded(fetchedUser)
     }.addOnFailureListener {

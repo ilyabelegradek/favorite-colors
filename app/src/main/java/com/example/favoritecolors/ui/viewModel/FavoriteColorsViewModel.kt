@@ -2,11 +2,14 @@ package com.example.favoritecolors.ui.viewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.favoritecolors.store.createUser
 import com.example.favoritecolors.store.getColorsFromDB
 import com.example.favoritecolors.store.loginUser
 import com.example.favoritecolors.models.ColorToFavorite
 import com.example.favoritecolors.store.getUser
+import com.example.favoritecolors.store.getUserById
+import com.example.favoritecolors.store.updateUsersFavoriteColor
 import com.example.favoritecolors.store.writeUser
 import com.example.favoritecolors.ui.state.ColorsState
 import com.google.firebase.Firebase
@@ -17,6 +20,7 @@ import com.google.firebase.database.database
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 
 private const val TAG = "FavoriteColorsViewModel"
 
@@ -34,8 +38,23 @@ class FavoriteColorsViewModel : ViewModel() {
     fun handleColorUpdate(colorToFavorite: ColorToFavorite) {
         _colorsState.value =
             _colorsState.value.copy(selectedColor = colorToFavorite)
-        if (_colorsState.value.user == null) {
+        val user = _colorsState.value.user
+        if (user == null) {
             toggleRegistrationDialog()
+        } else if (colorToFavorite != user.favoriteColor) {
+            viewModelScope.launch {
+                updateUsersFavoriteColor(database, user, colorToFavorite, {
+                    val uid = user.uid
+                    if (uid != null) {
+                        getUserById(database, uid, onUserLoaded = { fetchedUser ->
+                            _colorsState.value = _colorsState.value.copy(
+                                user = fetchedUser,
+                                isSubmitting = false
+                            )
+                        })
+                    }
+                }, {})
+            }
         }
     }
 
