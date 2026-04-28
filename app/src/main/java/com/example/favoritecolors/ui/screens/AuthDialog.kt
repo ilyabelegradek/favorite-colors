@@ -59,12 +59,13 @@ fun AuthDialog(viewModel: FavoriteColorsViewModel, state: ColorsState) {
                         )
                         Button(
                             onClick = { viewModel.signupHandler() },
+                            enabled = !state.isSubmitting,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 5.dp)
                                 .padding(bottom = 5.dp)
                         ) {
-                            Text(text = "Sign Up")
+                            Text(text = if (state.isSubmitting) "Signing Up..." else "Sign Up")
                         }
                     }
                 } else {
@@ -77,11 +78,12 @@ fun AuthDialog(viewModel: FavoriteColorsViewModel, state: ColorsState) {
                         PasswordField(viewModel, state)
                         Button(
                             onClick = { viewModel.loginHandler() },
+                            enabled = !state.isSubmitting,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(horizontal = 5.dp, vertical = 5.dp)
                         ) {
-                            Text(text = "Login")
+                            Text(text = if (state.isSubmitting) "Logging In..." else "Login")
                         }
                     }
                 }

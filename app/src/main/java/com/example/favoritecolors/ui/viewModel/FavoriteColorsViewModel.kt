@@ -73,7 +73,8 @@ class FavoriteColorsViewModel : ViewModel() {
     }
 
     fun signupHandler() {
-        if (validateSignupForm()) {
+        if (validateSignupForm() && !_colorsState.value.isSubmitting) {
+            _colorsState.value = _colorsState.value.copy(isSubmitting = true)
             createUser(
                 auth,
                 email = _colorsState.value.email,
@@ -86,27 +87,36 @@ class FavoriteColorsViewModel : ViewModel() {
                             _colorsState.value.selectedColor,
                             onSuccess = {
                                 getUser(database, firebaseUser, onUserLoaded = { fetchedUser ->
-                                    _colorsState.value = _colorsState.value.copy(user = fetchedUser)
+                                    _colorsState.value = _colorsState.value.copy(
+                                        user = fetchedUser,
+                                        isSubmitting = false
+                                    )
                                     toggleRegistrationDialog()
                                 })
                             },
-                            onFailure = { toggleRegistrationDialog() })
+                            onFailure = {
+                                _colorsState.value = _colorsState.value.copy(isSubmitting = false)
+                                toggleRegistrationDialog()
+                            })
                     } else {
                         Log.w(TAG, "onSignupSuccess but user came back null.")
+                        _colorsState.value = _colorsState.value.copy(isSubmitting = false)
                         toggleRegistrationDialog()
                     }
                 },
                 onSignupFailure = { errorMessage ->
                     _colorsState.value = _colorsState.value.copy(
                         authDialogError = true,
-                        authDialogMessage = errorMessage
+                        authDialogMessage = errorMessage,
+                        isSubmitting = false
                     )
                 })
         }
     }
 
     fun loginHandler() {
-        if (validateLoginForm()) {
+        if (validateLoginForm() && !_colorsState.value.isSubmitting) {
+            _colorsState.value = _colorsState.value.copy(isSubmitting = true)
             loginUser(
                 auth,
                 email = _colorsState.value.email,
@@ -114,17 +124,22 @@ class FavoriteColorsViewModel : ViewModel() {
                 onLoginSuccess = { firebaseUser ->
                     if (firebaseUser != null) {
                         getUser(database, firebaseUser, onUserLoaded = { fetchedUser ->
-                            _colorsState.value = _colorsState.value.copy(user = fetchedUser)
+                            _colorsState.value = _colorsState.value.copy(
+                                user = fetchedUser,
+                                isSubmitting = false
+                            )
                             toggleRegistrationDialog()
                         })
                     } else {
+                        _colorsState.value = _colorsState.value.copy(isSubmitting = false)
                         toggleRegistrationDialog()
                     }
                 },
                 onLoginFailure = { errorMessage ->
                     _colorsState.value = _colorsState.value.copy(
                         authDialogError = true,
-                        authDialogMessage = errorMessage
+                        authDialogMessage = errorMessage,
+                        isSubmitting = false
                     )
                 })
         }

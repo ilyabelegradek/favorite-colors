@@ -7,6 +7,7 @@ import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ServerValue
 import com.google.firebase.database.ValueEventListener
 
 private const val TAG = "database.kt"
@@ -19,6 +20,7 @@ fun getColorsFromDB(database: DatabaseReference, onColorsLoaded: (List<ColorToFa
             for (colorSnapshot in dataSnapshot.children) {
                 val item: ColorToFavorite? = colorSnapshot.getValue(ColorToFavorite::class.java)
                 if (item !== null) {
+                    item.uid = colorSnapshot.key
                     colors.add(item)
                 }
             }
@@ -47,6 +49,11 @@ fun writeUser(
     val childUpdates = hashMapOf<String, Any>(
         "/users/${user.uid}" to userValues,
     )
+
+    val colorUid = selectedColor?.uid
+    if (!colorUid.isNullOrEmpty()) {
+        childUpdates["/colors/$colorUid/favoriteCount"] = ServerValue.increment(1.0)
+    }
 
     database.updateChildren(childUpdates).addOnCompleteListener { task ->
         if (task.isSuccessful) {

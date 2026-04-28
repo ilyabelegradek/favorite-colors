@@ -9,7 +9,6 @@ data class ColorToFavorite(
     val color: String = "",
     val displayName: String = "",
     val favoriteCount: Int = 0,
-    val isFavorite: Boolean = false,
     val contrastColor: String = "#FFFFFF"
 ) {
     @Exclude
@@ -19,7 +18,6 @@ data class ColorToFavorite(
             "color" to color,
             "displayName" to displayName,
             "favoriteCount" to favoriteCount,
-            "isFavorite" to isFavorite,
             "contrastColor" to contrastColor,
         )
     }

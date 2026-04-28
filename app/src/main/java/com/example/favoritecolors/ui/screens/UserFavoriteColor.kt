@@ -18,9 +18,9 @@ fun UserFavoriteColor(state: ColorsState, viewModel: FavoriteColorsViewModel) {
             if (userFavoriteColor != null) {
                 ColorItem(
                     userFavoriteColor,
-                    viewModel
+                    viewModel,
+                    showFavoritesCount = false
                 )
-
             }
             Button(onClick = { viewModel.logoutHandler() }) {
                 Text(text = "Sign out")

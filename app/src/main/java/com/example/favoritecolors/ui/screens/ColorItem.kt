@@ -22,17 +22,13 @@ import com.example.favoritecolors.ui.viewModel.FavoriteColorsViewModel
 @Composable
 fun ColorItem(
     color: ColorToFavorite,
-    viewModel: FavoriteColorsViewModel
+    viewModel: FavoriteColorsViewModel,
+    showFavoritesCount: Boolean = true
 ) {
     val contrastColor = Color(color.contrastColor.toColorInt())
-    val borderModifier =
-        if (color.isFavorite) Modifier.border(
-            width = 4.dp,
-            color = contrastColor
-        ) else Modifier
 
     Box(
-        modifier = borderModifier
+        modifier = Modifier
             .size(200.dp)
             .background(color = Color(color.color.toColorInt()), shape = RectangleShape)
             .clickable {
@@ -45,9 +41,8 @@ fun ColorItem(
             verticalArrangement = Arrangement.Center
         ) {
             Text(text = color.displayName, color = contrastColor)
-            Text(text = color.favoriteCount.toString(), color = contrastColor)
-            if (color.isFavorite) {
-                Text(text = "Favorite Color!", color = contrastColor)
+            if (showFavoritesCount) {
+                Text(text = color.favoriteCount.toString(), color = contrastColor)
             }
         }
     }

@@ -15,5 +15,6 @@ data class ColorsState(
     val passwordRegex: Regex = Regex("^(?=.*[A-Z])(?=.*[@#$%^&+=!]).*$"),
     val user: User? = null,
     val selectedColor: ColorToFavorite? = null,
-    val fetchedColorHexCode: String = ""
+    val fetchedColorHexCode: String = "",
+    val isSubmitting: Boolean = false
 )
