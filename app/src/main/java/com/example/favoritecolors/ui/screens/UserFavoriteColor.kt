@@ -12,21 +12,32 @@ import com.example.favoritecolors.ui.viewModel.FavoriteColorsViewModel
 
 @Composable
 fun UserFavoriteColor(state: ColorsState, viewModel: FavoriteColorsViewModel) {
-    if (state.user != null) {
-        val userFavoriteColor = state.user.favoriteColor
-        Column(modifier = Modifier.padding(vertical = 5.dp)) {
-            if (userFavoriteColor != null) {
-                ColorItem(
-                    userFavoriteColor,
-                    viewModel,
-                    showFavoritesCount = false
-                )
-            }
-            Button(onClick = { viewModel.logoutHandler() }) {
-                Text(text = "Sign out")
+    Column(modifier = Modifier.padding(vertical = 5.dp)) {
+        SectionTitle(title = "Your Favorite Color") {
+            if (state.user != null) {
+                Button(
+                    modifier = Modifier.padding(end = 15.dp),
+                    onClick = { viewModel.logoutHandler() }) {
+                    Text(text = "Sign out")
+                }
+            } else {
+                Button(
+                    modifier = Modifier.padding(end = 15.dp),
+                    onClick = { viewModel.toggleRegistrationDialog() }) {
+                    Text(text = "Sign in")
+                }
             }
         }
-    } else {
-        Explanation()
+        if (state.user != null && state.user.favoriteColor != null) {
+            val userFavoriteColor = state.user.favoriteColor
+            ColorItem(
+                userFavoriteColor,
+                viewModel,
+                showFavoritesCount = false,
+                fullWidth = true
+            )
+        } else {
+            Explanation()
+        }
     }
 }

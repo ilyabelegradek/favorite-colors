@@ -11,6 +11,7 @@ import com.example.favoritecolors.ui.viewModel.FavoriteColorsViewModel
 
 @Composable
 fun ColorGrid(state: ColorsState, viewModel: FavoriteColorsViewModel = viewModel()) {
+    SectionTitle(title = "Pick A Favorite Color")
     LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 200.dp)) {
         items(state.colorsToFavorite) { color ->
             ColorItem(
