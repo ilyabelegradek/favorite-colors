@@ -59,7 +59,7 @@ fun writeUser(
         if (task.isSuccessful) {
             onSuccess()
         } else {
-            Log.w(TAG, "Error creating a new user.")
+            Log.w(TAG, "Error creating a new user. " + task.exception)
             onFailure()
         }
     }
@@ -85,7 +85,7 @@ fun updateUsersFavoriteColor(
         if (task.isSuccessful) {
             onSuccess()
         } else {
-            Log.w("ZEBRA", "Error updating favorite color: " + task.exception)
+            Log.w(TAG, "Error updating favorite color: " + task.exception)
             onFailure()
         }
     }

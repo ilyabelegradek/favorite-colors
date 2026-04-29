@@ -12,7 +12,7 @@ data class User(
     fun toMap(): Map<String, Any?> {
         return mapOf(
             "uid" to uid,
-            "favoriteColor" to favoriteColor,
+            "favoriteColor" to favoriteColor?.toMap(),
         )
     }
 }
