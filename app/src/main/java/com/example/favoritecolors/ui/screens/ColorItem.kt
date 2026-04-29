@@ -22,6 +22,7 @@ import com.example.favoritecolors.ui.viewModel.FavoriteColorsViewModel
 fun ColorItem(
     color: ColorToFavorite,
     viewModel: FavoriteColorsViewModel,
+    isSubmitting: Boolean = false,
     showFavoritesCount: Boolean = true
 ) {
     val contrastColor = Color(color.contrastColor.toColorInt())
@@ -30,7 +31,7 @@ fun ColorItem(
         modifier = Modifier
             .size(200.dp)
             .background(color = Color(color.color.toColorInt()), shape = RectangleShape)
-            .clickable {
+            .clickable(enabled = !isSubmitting) {
                 viewModel.handleColorUpdate(color)
             }
     ) {

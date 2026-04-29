@@ -14,8 +14,9 @@ fun ColorGrid(state: ColorsState, viewModel: FavoriteColorsViewModel = viewModel
     LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 200.dp)) {
         items(state.colorsToFavorite) { color ->
             ColorItem(
-                color,
-                viewModel
+                color = color,
+                viewModel = viewModel,
+                isSubmitting = state.isSubmitting
             )
         }
     }

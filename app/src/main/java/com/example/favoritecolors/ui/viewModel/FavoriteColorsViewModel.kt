@@ -2,13 +2,11 @@ package com.example.favoritecolors.ui.viewModel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.example.favoritecolors.store.createUser
 import com.example.favoritecolors.store.getColorsFromDB
 import com.example.favoritecolors.store.loginUser
 import com.example.favoritecolors.models.ColorToFavorite
-import com.example.favoritecolors.store.getUser
-import com.example.favoritecolors.store.getUserById
+import com.example.favoritecolors.store.observeUser
 import com.example.favoritecolors.store.updateUsersFavoriteColor
 import com.example.favoritecolors.store.writeUser
 import com.example.favoritecolors.ui.state.ColorsState
@@ -16,11 +14,11 @@ import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.auth
 import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.database
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
 
 private const val TAG = "FavoriteColorsViewModel"
 
@@ -29,6 +27,8 @@ class FavoriteColorsViewModel : ViewModel() {
     val colorsState: StateFlow<ColorsState> = _colorsState.asStateFlow()
     private var database: DatabaseReference = Firebase.database.reference
     private var auth: FirebaseAuth = Firebase.auth
+    private var userListener: ValueEventListener? = null
+    private var observedUid: String? = null
 
     init {
         loadColors()
@@ -36,25 +36,22 @@ class FavoriteColorsViewModel : ViewModel() {
     }
 
     fun handleColorUpdate(colorToFavorite: ColorToFavorite) {
-        _colorsState.value =
-            _colorsState.value.copy(selectedColor = colorToFavorite)
+        if (_colorsState.value.isSubmitting) return
+
         val user = _colorsState.value.user
         if (user == null) {
+            _colorsState.value =
+                _colorsState.value.copy(selectedColor = colorToFavorite)
             toggleRegistrationDialog()
-        } else if (colorToFavorite != user.favoriteColor) {
-            viewModelScope.launch {
-                updateUsersFavoriteColor(database, user, colorToFavorite, {
-                    val uid = user.uid
-                    if (uid != null) {
-                        getUserById(database, uid, onUserLoaded = { fetchedUser ->
-                            _colorsState.value = _colorsState.value.copy(
-                                user = fetchedUser,
-                                isSubmitting = false
-                            )
-                        })
-                    }
-                }, {})
-            }
+        } else if (colorToFavorite.color != user.favoriteColor?.color) {
+            _colorsState.value =
+                _colorsState.value.copy(selectedColor = colorToFavorite, isSubmitting = true)
+            updateUsersFavoriteColor(
+                database, user, colorToFavorite, {},
+                {
+                    _colorsState.value =
+                        _colorsState.value.copy(isSubmitting = false)
+                })
         }
     }
 
@@ -105,13 +102,8 @@ class FavoriteColorsViewModel : ViewModel() {
                             firebaseUser,
                             _colorsState.value.selectedColor,
                             onSuccess = {
-                                getUser(database, firebaseUser, onUserLoaded = { fetchedUser ->
-                                    _colorsState.value = _colorsState.value.copy(
-                                        user = fetchedUser,
-                                        isSubmitting = false
-                                    )
-                                    toggleRegistrationDialog()
-                                })
+                                startObservingUser(firebaseUser.uid)
+                                toggleRegistrationDialog()
                             },
                             onFailure = {
                                 _colorsState.value = _colorsState.value.copy(isSubmitting = false)
@@ -142,13 +134,8 @@ class FavoriteColorsViewModel : ViewModel() {
                 password = _colorsState.value.password,
                 onLoginSuccess = { firebaseUser ->
                     if (firebaseUser != null) {
-                        getUser(database, firebaseUser, onUserLoaded = { fetchedUser ->
-                            _colorsState.value = _colorsState.value.copy(
-                                user = fetchedUser,
-                                isSubmitting = false
-                            )
-                            toggleRegistrationDialog()
-                        })
+                        startObservingUser(firebaseUser.uid)
+                        toggleRegistrationDialog()
                     } else {
                         _colorsState.value = _colorsState.value.copy(isSubmitting = false)
                         toggleRegistrationDialog()
@@ -166,7 +153,13 @@ class FavoriteColorsViewModel : ViewModel() {
 
     fun logoutHandler() {
         auth.signOut()
+        stopObservingUser()
         _colorsState.value = _colorsState.value.copy(user = null)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopObservingUser()
     }
 
     private fun loadColors() {
@@ -178,10 +171,30 @@ class FavoriteColorsViewModel : ViewModel() {
     private fun initialLogin() {
         val currentUser = auth.currentUser
         if (currentUser != null) {
-            getUser(database, currentUser, onUserLoaded = { fetchedUser ->
-                _colorsState.value = _colorsState.value.copy(user = fetchedUser)
-            })
+            startObservingUser(currentUser.uid)
         }
+    }
+
+    private fun startObservingUser(uid: String) {
+        if (observedUid == uid) return
+        stopObservingUser()
+        observedUid = uid
+        userListener = observeUser(database, uid) { fetchedUser ->
+            _colorsState.value = _colorsState.value.copy(
+                user = fetchedUser,
+                isSubmitting = false
+            )
+        }
+    }
+
+    private fun stopObservingUser() {
+        val uid = observedUid
+        val listener = userListener
+        if (uid != null && listener != null) {
+            database.child("users").child(uid).removeEventListener(listener)
+        }
+        userListener = null
+        observedUid = null
     }
 
     private fun validateSignupForm(): Boolean {

@@ -91,22 +91,23 @@ fun updateUsersFavoriteColor(
     }
 }
 
-fun getUser(database: DatabaseReference, user: FirebaseUser, onUserLoaded: (User?) -> Unit) {
-    database.child("users").child(user.uid).get().addOnSuccessListener { user ->
-        val fetchedUser: User? = user.getValue(User::class.java)
-        onUserLoaded(fetchedUser)
-    }.addOnFailureListener {
-        Log.w(TAG, "Error getting user: ", it)
-    }
-}
+fun observeUser(
+    database: DatabaseReference,
+    uid: String,
+    onUserLoaded: (User?) -> Unit
+): ValueEventListener {
+    val userListener = object : ValueEventListener {
+        override fun onDataChange(snapshot: DataSnapshot) {
+            val fetchedUser = snapshot.getValue(User::class.java)
+            onUserLoaded(fetchedUser)
+        }
 
-fun getUserById(database: DatabaseReference, uid: String, onUserLoaded: (User?) -> Unit) {
-    database.child("users").child(uid).get().addOnSuccessListener { user ->
-        val fetchedUser: User? = user.getValue(User::class.java)
-        onUserLoaded(fetchedUser)
-    }.addOnFailureListener {
-        Log.w(TAG, "Error getting user: ", it)
+        override fun onCancelled(error: DatabaseError) {
+            Log.w(TAG, "observeUser:onCancelled", error.toException())
+        }
     }
+    database.child("users").child(uid).addValueEventListener(userListener)
+    return userListener
 }
 
 //fun getColorsToFavorite(): List<ColorToFavorite> {

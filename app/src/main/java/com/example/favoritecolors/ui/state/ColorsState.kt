@@ -16,5 +16,5 @@ data class ColorsState(
     val user: User? = null,
     val selectedColor: ColorToFavorite? = null,
     val fetchedColorHexCode: String = "",
-    val isSubmitting: Boolean = false
+    val isSubmitting: Boolean = false,
 )
