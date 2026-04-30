@@ -1,7 +1,6 @@
 package com.example.favoritecolors.ui.screens
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -18,9 +17,5 @@ fun Content(viewModel: FavoriteColorsViewModel = viewModel()) {
     }
     if (state.showSortingDialog) {
         SortingDialog(viewModel, state)
-    }
-
-    LaunchedEffect(state.selectedSortingMethod) {
-        viewModel.sortColors(state.colorsToFavorite)
     }
 }

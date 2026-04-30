@@ -171,26 +171,36 @@ class FavoriteColorsViewModel : ViewModel() {
     }
 
     fun setSortingMethod(sortingMethod: String) {
-        _colorsState.value = _colorsState.value.copy(
+        val currentState = _colorsState.value
+        val sortedColors = getSortedColors(currentState.colorsToFavorite, sortingMethod)
+
+        _colorsState.value = currentState.copy(
             selectedSortingMethod = sortingMethod,
-            showSortingDialog = !_colorsState.value.showSortingDialog
+            showSortingDialog = !currentState.showSortingDialog,
+            colorsToFavorite = sortedColors
         )
     }
 
-    fun sortColors(favoriteColors: List<ColorToFavorite>) {
-        val sortedColors = when (_colorsState.value.selectedSortingMethod) {
+    private fun getSortedColors(
+        favoriteColors: List<ColorToFavorite>,
+        sortingMethod: String
+    ): List<ColorToFavorite> {
+        return when (sortingMethod) {
             SORTING_RANDOM -> favoriteColors.shuffled()
             SORTING_MOST_VOTES -> favoriteColors.sortedByDescending { it.favoriteCount }
             SORTING_LEAST_VOTES -> favoriteColors.sortedBy { it.favoriteCount }
             else -> favoriteColors
         }
-
-        _colorsState.value = _colorsState.value.copy(colorsToFavorite = sortedColors)
     }
 
     private fun loadColors() {
         getColorsFromDB(database) { favoriteColors ->
-            sortColors(favoriteColors)
+            _colorsState.value = _colorsState.value.copy(
+                colorsToFavorite = getSortedColors(
+                    favoriteColors,
+                    _colorsState.value.selectedSortingMethod
+                )
+            )
         }
     }
 
