@@ -6,6 +6,9 @@ import com.example.favoritecolors.store.createUser
 import com.example.favoritecolors.store.getColorsFromDB
 import com.example.favoritecolors.store.loginUser
 import com.example.favoritecolors.models.ColorToFavorite
+import com.example.favoritecolors.models.SORTING_LEAST_VOTES
+import com.example.favoritecolors.models.SORTING_MOST_VOTES
+import com.example.favoritecolors.models.SORTING_RANDOM
 import com.example.favoritecolors.store.observeUser
 import com.example.favoritecolors.store.updateUsersFavoriteColor
 import com.example.favoritecolors.store.writeUser
@@ -33,6 +36,11 @@ class FavoriteColorsViewModel : ViewModel() {
     init {
         loadColors()
         initialLogin()
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        stopObservingUser()
     }
 
     fun handleColorUpdate(colorToFavorite: ColorToFavorite) {
@@ -157,14 +165,32 @@ class FavoriteColorsViewModel : ViewModel() {
         _colorsState.value = _colorsState.value.copy(user = null)
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        stopObservingUser()
+    fun toggleSortingDialog() {
+        _colorsState.value =
+            _colorsState.value.copy(showSortingDialog = !_colorsState.value.showSortingDialog)
+    }
+
+    fun setSortingMethod(sortingMethod: String) {
+        _colorsState.value = _colorsState.value.copy(
+            selectedSortingMethod = sortingMethod,
+            showSortingDialog = !_colorsState.value.showSortingDialog
+        )
+    }
+
+    fun sortColors(favoriteColors: List<ColorToFavorite>) {
+        val sortedColors = when (_colorsState.value.selectedSortingMethod) {
+            SORTING_RANDOM -> favoriteColors.shuffled()
+            SORTING_MOST_VOTES -> favoriteColors.sortedByDescending { it.favoriteCount }
+            SORTING_LEAST_VOTES -> favoriteColors.sortedBy { it.favoriteCount }
+            else -> favoriteColors
+        }
+
+        _colorsState.value = _colorsState.value.copy(colorsToFavorite = sortedColors)
     }
 
     private fun loadColors() {
         getColorsFromDB(database) { favoriteColors ->
-            _colorsState.value = _colorsState.value.copy(colorsToFavorite = favoriteColors)
+            sortColors(favoriteColors)
         }
     }
 
