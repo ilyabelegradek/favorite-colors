@@ -7,9 +7,7 @@ import com.example.favoritecolors.store.getColorsFromDB
 import com.example.favoritecolors.store.loginUser
 import com.example.favoritecolors.models.ColorToFavorite
 import com.example.favoritecolors.models.DialogState
-import com.example.favoritecolors.models.SORTING_LEAST_VOTES
-import com.example.favoritecolors.models.SORTING_MOST_VOTES
-import com.example.favoritecolors.models.SORTING_RANDOM
+import com.example.favoritecolors.models.SortingMethod
 import com.example.favoritecolors.store.observeUser
 import com.example.favoritecolors.store.updateUsersFavoriteColor
 import com.example.favoritecolors.store.writeUser
@@ -166,7 +164,7 @@ class FavoriteColorsViewModel : ViewModel() {
         _colorsState.value = _colorsState.value.copy(user = null)
     }
 
-    fun setSortingMethod(sortingMethod: String) {
+    fun setSortingMethod(sortingMethod: SortingMethod) {
         val currentState = _colorsState.value
         val sortedColors = getSortedColors(currentState.colorsToFavorite, sortingMethod)
 
@@ -179,13 +177,12 @@ class FavoriteColorsViewModel : ViewModel() {
 
     private fun getSortedColors(
         favoriteColors: List<ColorToFavorite>,
-        sortingMethod: String
+        sortingMethod: SortingMethod
     ): List<ColorToFavorite> {
         return when (sortingMethod) {
-            SORTING_RANDOM -> favoriteColors.shuffled()
-            SORTING_MOST_VOTES -> favoriteColors.sortedByDescending { it.favoriteCount }
-            SORTING_LEAST_VOTES -> favoriteColors.sortedBy { it.favoriteCount }
-            else -> favoriteColors
+            SortingMethod.RANDOM -> favoriteColors.shuffled()
+            SortingMethod.MOST_VOTES -> favoriteColors.sortedByDescending { it.favoriteCount }
+            SortingMethod.LEAST_VOTES -> favoriteColors.sortedBy { it.favoriteCount }
         }
     }
 

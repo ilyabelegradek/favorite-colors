@@ -21,9 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.favoritecolors.models.DialogState
 import com.example.favoritecolors.ui.state.ColorsState
 import com.example.favoritecolors.ui.viewModel.FavoriteColorsViewModel
-import com.example.favoritecolors.models.SORTING_LEAST_VOTES
-import com.example.favoritecolors.models.SORTING_MOST_VOTES
-import com.example.favoritecolors.models.SORTING_RANDOM
+import com.example.favoritecolors.models.SortingMethod
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -37,7 +35,7 @@ fun SortingDialog(viewModel: FavoriteColorsViewModel, state: ColorsState) {
             tonalElevation = 6.dp
         ) {
             Column(modifier = Modifier.selectableGroup()) {
-                state.sortingMethods.forEach { text ->
+                SortingMethod.entries.forEach { text ->
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -66,11 +64,10 @@ fun SortingDialog(viewModel: FavoriteColorsViewModel, state: ColorsState) {
     }
 }
 
-fun getRadioButtonTranslation(radioText: String): String {
+fun getRadioButtonTranslation(radioText: SortingMethod): String {
     return when (radioText) {
-        SORTING_RANDOM -> "Random"
-        SORTING_MOST_VOTES -> "Most Votes"
-        SORTING_LEAST_VOTES -> "Least Votes"
-        else -> ""
+        SortingMethod.RANDOM -> "Random"
+        SortingMethod.MOST_VOTES -> "Most Votes"
+        SortingMethod.LEAST_VOTES -> "Least Votes"
     }
 }

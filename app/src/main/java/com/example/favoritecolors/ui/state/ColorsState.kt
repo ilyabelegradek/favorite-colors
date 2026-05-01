@@ -2,9 +2,7 @@ package com.example.favoritecolors.ui.state
 
 import com.example.favoritecolors.models.ColorToFavorite
 import com.example.favoritecolors.models.DialogState
-import com.example.favoritecolors.models.SORTING_LEAST_VOTES
-import com.example.favoritecolors.models.SORTING_MOST_VOTES
-import com.example.favoritecolors.models.SORTING_RANDOM
+import com.example.favoritecolors.models.SortingMethod
 import com.example.favoritecolors.models.User
 
 data class ColorsState(
@@ -21,9 +19,5 @@ data class ColorsState(
     val selectedColor: ColorToFavorite? = null,
     val fetchedColorHexCode: String = "",
     val isSubmitting: Boolean = false,
-    val selectedSortingMethod: String = SORTING_RANDOM,
-    val sortingMethods: List<String> = listOf(
-        SORTING_RANDOM, SORTING_MOST_VOTES,
-        SORTING_LEAST_VOTES
-    )
+    val selectedSortingMethod: SortingMethod = SortingMethod.RANDOM,
 )
