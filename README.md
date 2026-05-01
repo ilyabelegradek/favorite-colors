@@ -5,6 +5,8 @@
 Favorite Colors is a Jetpack Compose Kotlin app developed by Ilya Belegradek.
 Read on to learn how this app collects and uses personal data.
 
+**This app has not yet been deployed to Google Play**
+
 ### 1. Data Collection and Usage
 
 To provide the app's functionality (voting for colors), the following services are used:
