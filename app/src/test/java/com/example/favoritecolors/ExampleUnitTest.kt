@@ -1,4 +1,4 @@
-package com.example.favoritecolors
+package com.ilyabelegradek.favoritecolors
 
 import org.junit.Test
 

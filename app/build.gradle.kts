@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.favoritecolors"
+    namespace = "com.ilyabelegradek.favoritecolors"
     compileSdk = 37
 
     defaultConfig {
-        applicationId = "com.example.favoritecolors"
+        applicationId = "com.ilyabelegradek.favoritecolors"
         minSdk = 24
         targetSdk = 37
         versionCode = 1
@@ -47,6 +47,7 @@ android {
 dependencies {
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.appcompat)
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
@@ -64,5 +65,6 @@ dependencies {
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.database)
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.ui.auth)
     implementation(libs.colorpicker.compose)
 }
