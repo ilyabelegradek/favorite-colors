@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.favoritecolors.ui.screens.dialogs.DialogWrapper
 import com.example.favoritecolors.ui.viewModel.FavoriteColorsViewModel
 
 @Composable
@@ -12,10 +13,5 @@ fun Content(viewModel: FavoriteColorsViewModel = viewModel()) {
 
     UserFavoriteColor(state, viewModel)
     ColorGrid(state, viewModel)
-    if (state.showAuthDialog) {
-        AuthDialog(viewModel, state)
-    }
-    if (state.showSortingDialog) {
-        SortingDialog(viewModel, state)
-    }
+    DialogWrapper(state, viewModel)
 }

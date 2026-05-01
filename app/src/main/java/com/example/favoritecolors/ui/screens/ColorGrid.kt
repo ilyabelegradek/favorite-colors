@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.favoritecolors.models.DialogState
 import com.example.favoritecolors.ui.state.ColorsState
 import com.example.favoritecolors.ui.viewModel.FavoriteColorsViewModel
 
@@ -18,9 +19,12 @@ fun ColorGrid(state: ColorsState, viewModel: FavoriteColorsViewModel = viewModel
     SectionTitle(title = "Pick A Favorite Color") {
         Button(
             modifier = Modifier.padding(end = 15.dp),
-            onClick = { viewModel.toggleSortingDialog() }) {
+            onClick = { viewModel.setDialogState(DialogState.SORTING) }) {
             Text(text = "Sort Colors")
         }
+    }
+    Button(onClick = { viewModel.setDialogState(DialogState.COLOR_PICKER) }) {
+        Text(text = "Pick your own!")
     }
     LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 200.dp)) {
         items(state.colorsToFavorite) { color ->

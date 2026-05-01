@@ -6,6 +6,7 @@ import com.example.favoritecolors.store.createUser
 import com.example.favoritecolors.store.getColorsFromDB
 import com.example.favoritecolors.store.loginUser
 import com.example.favoritecolors.models.ColorToFavorite
+import com.example.favoritecolors.models.DialogState
 import com.example.favoritecolors.models.SORTING_LEAST_VOTES
 import com.example.favoritecolors.models.SORTING_MOST_VOTES
 import com.example.favoritecolors.models.SORTING_RANDOM
@@ -50,7 +51,7 @@ class FavoriteColorsViewModel : ViewModel() {
         if (user == null) {
             _colorsState.value =
                 _colorsState.value.copy(selectedColor = colorToFavorite)
-            toggleRegistrationDialog()
+            setDialogState(DialogState.AUTH)
         } else if (colorToFavorite.color != user.favoriteColor?.color) {
             _colorsState.value =
                 _colorsState.value.copy(selectedColor = colorToFavorite, isSubmitting = true)
@@ -63,9 +64,9 @@ class FavoriteColorsViewModel : ViewModel() {
         }
     }
 
-    fun toggleRegistrationDialog() {
+    fun setDialogState(dialogState: DialogState) {
         _colorsState.value =
-            _colorsState.value.copy(showAuthDialog = !_colorsState.value.showAuthDialog)
+            _colorsState.value.copy(dialogState = dialogState)
     }
 
     fun setSignupTab(selected: Boolean) {
@@ -111,16 +112,16 @@ class FavoriteColorsViewModel : ViewModel() {
                             _colorsState.value.selectedColor,
                             onSuccess = {
                                 startObservingUser(firebaseUser.uid)
-                                toggleRegistrationDialog()
+                                setDialogState(DialogState.NONE)
                             },
                             onFailure = {
                                 _colorsState.value = _colorsState.value.copy(isSubmitting = false)
-                                toggleRegistrationDialog()
+                                setDialogState(DialogState.NONE)
                             })
                     } else {
                         Log.w(TAG, "onSignupSuccess but user came back null.")
                         _colorsState.value = _colorsState.value.copy(isSubmitting = false)
-                        toggleRegistrationDialog()
+                        setDialogState(DialogState.NONE)
                     }
                 },
                 onSignupFailure = { errorMessage ->
@@ -143,10 +144,10 @@ class FavoriteColorsViewModel : ViewModel() {
                 onLoginSuccess = { firebaseUser ->
                     if (firebaseUser != null) {
                         startObservingUser(firebaseUser.uid)
-                        toggleRegistrationDialog()
+                        setDialogState(DialogState.NONE)
                     } else {
                         _colorsState.value = _colorsState.value.copy(isSubmitting = false)
-                        toggleRegistrationDialog()
+                        setDialogState(DialogState.NONE)
                     }
                 },
                 onLoginFailure = { errorMessage ->
@@ -165,18 +166,13 @@ class FavoriteColorsViewModel : ViewModel() {
         _colorsState.value = _colorsState.value.copy(user = null)
     }
 
-    fun toggleSortingDialog() {
-        _colorsState.value =
-            _colorsState.value.copy(showSortingDialog = !_colorsState.value.showSortingDialog)
-    }
-
     fun setSortingMethod(sortingMethod: String) {
         val currentState = _colorsState.value
         val sortedColors = getSortedColors(currentState.colorsToFavorite, sortingMethod)
 
         _colorsState.value = currentState.copy(
             selectedSortingMethod = sortingMethod,
-            showSortingDialog = !currentState.showSortingDialog,
+            dialogState = DialogState.NONE,
             colorsToFavorite = sortedColors
         )
     }

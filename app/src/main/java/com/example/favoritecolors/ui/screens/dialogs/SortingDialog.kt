@@ -1,4 +1,4 @@
-package com.example.favoritecolors.ui.screens
+package com.example.favoritecolors.ui.screens.dialogs
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +18,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
+import com.example.favoritecolors.models.DialogState
 import com.example.favoritecolors.ui.state.ColorsState
 import com.example.favoritecolors.ui.viewModel.FavoriteColorsViewModel
 import com.example.favoritecolors.models.SORTING_LEAST_VOTES
@@ -29,7 +30,7 @@ import com.example.favoritecolors.models.SORTING_RANDOM
 @Composable
 fun SortingDialog(viewModel: FavoriteColorsViewModel, state: ColorsState) {
     BasicAlertDialog(
-        onDismissRequest = { viewModel.toggleSortingDialog() },
+        onDismissRequest = { viewModel.setDialogState(DialogState.NONE) },
     ) {
         Surface(
             shape = MaterialTheme.shapes.extraLarge,

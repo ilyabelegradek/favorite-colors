@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.favoritecolors.models.DialogState
 import com.example.favoritecolors.ui.state.ColorsState
 import com.example.favoritecolors.ui.viewModel.FavoriteColorsViewModel
 
@@ -23,7 +24,7 @@ fun UserFavoriteColor(state: ColorsState, viewModel: FavoriteColorsViewModel) {
             } else {
                 Button(
                     modifier = Modifier.padding(end = 15.dp),
-                    onClick = { viewModel.toggleRegistrationDialog() }) {
+                    onClick = { viewModel.setDialogState(DialogState.AUTH) }) {
                     Text(text = "Sign in")
                 }
             }
