@@ -91,6 +91,46 @@ fun updateUsersFavoriteColor(
     }
 }
 
+fun writeCustomColor(
+    database: DatabaseReference,
+    user: User?,
+    customColorHex: String,
+    onSuccess: () -> Unit,
+    onFailure: () -> Unit
+) {
+    if (user == null) {
+        onFailure()
+        return
+    }
+
+    val key = database.child("colors").push().key
+    if (key == null) {
+        onFailure()
+        return
+    }
+
+    val customColor = ColorToFavorite(
+        uid = key,
+        color = customColorHex,
+        createdByUser = user.uid,
+        favoriteCount = 1
+    )
+    val colorValues = customColor.toMap()
+    val childUpdates = hashMapOf<String, Any>(
+        "/colors/${key}" to colorValues,
+        "/users/${user.uid}/favoriteColor" to colorValues
+    )
+
+    database.updateChildren(childUpdates).addOnCompleteListener { task ->
+        if (task.isSuccessful) {
+            onSuccess()
+        } else {
+            Log.w(TAG, "Error creating custom color: " + task.exception)
+            onFailure()
+        }
+    }
+}
+
 fun observeUser(
     database: DatabaseReference,
     uid: String,
@@ -109,18 +149,3 @@ fun observeUser(
     database.child("users").child(uid).addValueEventListener(userListener)
     return userListener
 }
-
-//fun getColorsToFavorite(): List<ColorToFavorite> {
-//    return listOf(
-//        ColorToFavorite("#12a4e3", "Sky Blue", 0, false),
-//        ColorToFavorite("#0000FF", "Blue", 0, true),
-//        ColorToFavorite("#5af542", "Neon Green", 0, false, contrastColor = "#000000"),
-//        ColorToFavorite("#e3362d", "Red", 0, false),
-//        ColorToFavorite("#e3972d", "Orange", 0, false),
-//        ColorToFavorite("#e8d827", "Yellow", 0, false, contrastColor = "#000000"),
-//        ColorToFavorite("#6815cf", "Purple", 0, false),
-//        ColorToFavorite("#eb17e7", "Pink", 0, false),
-//        ColorToFavorite("#000000", "Black", 0, false),
-//        ColorToFavorite("#FFFFFF", "White", 0, false, contrastColor = "#e3362d"),
-//    ).shuffled()
-//}

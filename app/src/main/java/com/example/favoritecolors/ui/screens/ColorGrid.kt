@@ -23,9 +23,6 @@ fun ColorGrid(state: ColorsState, viewModel: FavoriteColorsViewModel = viewModel
             Text(text = "Sort Colors")
         }
     }
-    Button(onClick = { viewModel.setDialogState(DialogState.COLOR_PICKER) }) {
-        Text(text = "Pick your own!")
-    }
     LazyVerticalGrid(columns = GridCells.Adaptive(minSize = 200.dp)) {
         items(state.colorsToFavorite) { color ->
             ColorItem(

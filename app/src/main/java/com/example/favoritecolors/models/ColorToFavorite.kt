@@ -9,7 +9,8 @@ data class ColorToFavorite(
     val color: String = "",
     val displayName: String = "",
     val favoriteCount: Int = 0,
-    val contrastColor: String = "#FFFFFF"
+    val contrastColor: String = "#FFFFFF",
+    val createdByUser: String? = "",
 ) {
     @Exclude
     fun toMap(): Map<String, Any?> {
@@ -19,6 +20,7 @@ data class ColorToFavorite(
             "displayName" to displayName,
             "favoriteCount" to favoriteCount,
             "contrastColor" to contrastColor,
+            "createdByUser" to createdByUser,
         )
     }
 

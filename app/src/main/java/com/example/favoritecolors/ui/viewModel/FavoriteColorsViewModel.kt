@@ -10,6 +10,7 @@ import com.example.favoritecolors.models.DialogState
 import com.example.favoritecolors.models.SortingMethod
 import com.example.favoritecolors.store.observeUser
 import com.example.favoritecolors.store.updateUsersFavoriteColor
+import com.example.favoritecolors.store.writeCustomColor
 import com.example.favoritecolors.store.writeUser
 import com.example.favoritecolors.ui.state.ColorsState
 import com.google.firebase.Firebase
@@ -173,6 +174,19 @@ class FavoriteColorsViewModel : ViewModel() {
             dialogState = DialogState.NONE,
             colorsToFavorite = sortedColors
         )
+    }
+
+    fun saveCustomColor(colorHex: String) {
+        writeCustomColor(
+            database = database,
+            user = _colorsState.value.user,
+            customColorHex = colorHex,
+            onSuccess = {
+                _colorsState.value = _colorsState.value.copy(
+                    dialogState = DialogState.NONE,
+                )
+            },
+            onFailure = {})
     }
 
     private fun getSortedColors(

@@ -29,13 +29,10 @@ fun UserFavoriteColor(state: ColorsState, viewModel: FavoriteColorsViewModel) {
                 }
             }
         }
-        if (state.user != null && state.user.favoriteColor != null) {
-            val userFavoriteColor = state.user.favoriteColor
-            ColorItem(
-                userFavoriteColor,
-                viewModel,
-                showFavoritesCount = false,
-                fullWidth = true
+        if (state.user != null) {
+            UserColorItem(
+                state.user.favoriteColor,
+                viewModel
             )
         } else {
             Explanation()

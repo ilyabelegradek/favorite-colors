@@ -25,17 +25,12 @@ fun ColorItem(
     color: ColorToFavorite,
     viewModel: FavoriteColorsViewModel,
     isSubmitting: Boolean = false,
-    showFavoritesCount: Boolean = true,
-    fullWidth: Boolean = false
 ) {
     val contrastColor = Color(color.contrastColor.toColorInt())
-    val sizeModifier =
-        if (fullWidth) Modifier
-            .fillMaxWidth()
-            .height(200.dp) else Modifier.size(200.dp)
 
     Box(
-        modifier = sizeModifier
+        modifier = Modifier
+            .size(200.dp)
             .background(color = Color(color.color.toColorInt()), shape = RectangleShape)
             .clickable(enabled = !isSubmitting) {
                 viewModel.handleColorUpdate(color)
@@ -46,10 +41,11 @@ fun ColorItem(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Text(text = color.displayName, color = contrastColor)
-            if (showFavoritesCount) {
-                Text(text = color.favoriteCount.toString(), color = contrastColor)
-            }
+            Text(
+                text = if (color.displayName != "") color.displayName else color.color,
+                color = contrastColor
+            )
+            Text(text = color.favoriteCount.toString(), color = contrastColor)
         }
     }
 }
