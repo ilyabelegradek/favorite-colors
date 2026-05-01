@@ -66,6 +66,7 @@ fun SortingDialog(viewModel: FavoriteColorsViewModel, state: ColorsState) {
 
 fun getRadioButtonTranslation(radioText: SortingMethod): String {
     return when (radioText) {
+        SortingMethod.COLOR -> "Color"
         SortingMethod.RANDOM -> "Random"
         SortingMethod.MOST_VOTES -> "Most Votes"
         SortingMethod.LEAST_VOTES -> "Least Votes"

@@ -203,6 +203,7 @@ class FavoriteColorsViewModel : ViewModel() {
         sortingMethod: SortingMethod
     ): List<ColorToFavorite> {
         return when (sortingMethod) {
+            SortingMethod.COLOR -> favoriteColors.sortedBy { it.color }
             SortingMethod.RANDOM -> favoriteColors.shuffled()
             SortingMethod.MOST_VOTES -> favoriteColors.sortedByDescending { it.favoriteCount }
             SortingMethod.LEAST_VOTES -> favoriteColors.sortedBy { it.favoriteCount }

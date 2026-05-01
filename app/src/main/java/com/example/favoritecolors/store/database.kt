@@ -115,15 +115,18 @@ fun writeCustomColor(
     val customColor = ColorToFavorite(
         uid = key,
         color = customColorHex,
-        createdByUser = user.uid,
         favoriteCount = 1,
-        contrastColor = getContrastColor(customColorHex)
+        contrastColor = getContrastColor(customColorHex),
     )
     val colorValues = customColor.toMap()
     val childUpdates = hashMapOf<String, Any>(
         "/colors/${key}" to colorValues,
         "/users/${user.uid}/favoriteColor" to colorValues
     )
+    val oldFavoriteUid = user.favoriteColor?.uid
+    if (!oldFavoriteUid.isNullOrEmpty()) {
+        childUpdates["/colors/$oldFavoriteUid/favoriteCount"] = ServerValue.increment(-1.0)
+    }
 
     database.updateChildren(childUpdates).addOnCompleteListener { task ->
         if (task.isSuccessful) {
