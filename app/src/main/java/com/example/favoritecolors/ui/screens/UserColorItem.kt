@@ -71,7 +71,7 @@ fun UserColorItem(
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = if (color.displayName != "") color.displayName else color.color,
+                    text = color.color,
                     color = Color(color.contrastColor.toColorInt())
                 )
             }

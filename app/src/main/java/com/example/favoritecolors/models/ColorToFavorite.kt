@@ -7,9 +7,8 @@ import com.google.firebase.database.IgnoreExtraProperties
 data class ColorToFavorite(
     var uid: String? = "",
     val color: String = "",
-    val displayName: String = "",
     val favoriteCount: Int = 0,
-    val contrastColor: String = "#FFFFFF",
+    var contrastColor: String = "",
     val createdByUser: String? = "",
 ) {
     @Exclude
@@ -17,14 +16,9 @@ data class ColorToFavorite(
         return mapOf(
             "uid" to uid,
             "color" to color,
-            "displayName" to displayName,
             "favoriteCount" to favoriteCount,
             "contrastColor" to contrastColor,
             "createdByUser" to createdByUser,
         )
-    }
-
-    override fun toString(): String {
-        return this.displayName + ": " + this.color
     }
 }

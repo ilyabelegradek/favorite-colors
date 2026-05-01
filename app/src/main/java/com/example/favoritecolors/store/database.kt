@@ -21,6 +21,9 @@ fun getColorsFromDB(database: DatabaseReference, onColorsLoaded: (List<ColorToFa
                 val item: ColorToFavorite? = colorSnapshot.getValue(ColorToFavorite::class.java)
                 if (item !== null) {
                     item.uid = colorSnapshot.key
+                    if (item.contrastColor.isEmpty()) {
+                        item.contrastColor = getContrastColor(item.color)
+                    }
                     colors.add(item)
                 }
             }
@@ -113,7 +116,8 @@ fun writeCustomColor(
         uid = key,
         color = customColorHex,
         createdByUser = user.uid,
-        favoriteCount = 1
+        favoriteCount = 1,
+        contrastColor = getContrastColor(customColorHex)
     )
     val colorValues = customColor.toMap()
     val childUpdates = hashMapOf<String, Any>(
