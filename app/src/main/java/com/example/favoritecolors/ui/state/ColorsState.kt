@@ -20,4 +20,5 @@ data class ColorsState(
     val fetchedColorHexCode: String = "",
     val isSubmitting: Boolean = false,
     val selectedSortingMethod: SortingMethod = SortingMethod.RANDOM,
+    val colorPickerDialogMessage: String = ""
 )

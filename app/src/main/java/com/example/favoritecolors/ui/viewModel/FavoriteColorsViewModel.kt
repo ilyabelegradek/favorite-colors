@@ -177,6 +177,15 @@ class FavoriteColorsViewModel : ViewModel() {
     }
 
     fun saveCustomColor(colorHex: String) {
+        for (color in _colorsState.value.colorsToFavorite) {
+            if (color.color == colorHex) {
+                _colorsState.value = _colorsState.value.copy(
+                    colorPickerDialogMessage = "Color already exists! Please vote for it below.",
+                )
+                return
+            }
+        }
+
         writeCustomColor(
             database = database,
             user = _colorsState.value.user,

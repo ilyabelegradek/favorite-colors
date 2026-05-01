@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.toColorInt
 import com.example.favoritecolors.models.DialogState
@@ -62,11 +63,22 @@ fun ColorPickerDialog(viewModel: FavoriteColorsViewModel, state: ColorsState) {
 
                     }
                 }
-                if (newFavColor.value != "")
+                if (newFavColor.value != "") {
                     Text(
                         text = "New Favorite Color: ${newFavColor.value}",
                         color = Color(newFavColor.value.toColorInt())
                     )
+                }
+
+                if (state.colorPickerDialogMessage != "") {
+                    Text(
+                        text = state.colorPickerDialogMessage,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(vertical = 5.dp),
+                        textAlign = TextAlign.Center
+                    )
+                }
+
                 Button(
                     onClick = { viewModel.saveCustomColor(newFavColor.value) },
                     modifier = Modifier
