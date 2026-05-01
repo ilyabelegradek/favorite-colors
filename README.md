@@ -38,7 +38,7 @@ new color other users can vote for. This library does not collect any user data.
 Users have the right to request the deletion of their account and associated voting data. To request
 data deletion, please use the "Delete Account" option in the app settings.
 
-### 5. Contact Us
+### 5. Contact
 
 If you have any questions or suggestions about the Privacy Policy, do not hesitate to contact me at:
 ilyabelegradek25@gmail.com
