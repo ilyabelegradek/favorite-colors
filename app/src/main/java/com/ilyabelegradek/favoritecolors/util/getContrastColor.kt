@@ -1,4 +1,4 @@
-package com.ilyabelegradek.favoritecolors.store
+package com.ilyabelegradek.favoritecolors.util
 
 fun getContrastColor(hexColor: String): String {
     val color = hexColor.removePrefix("#").toInt(16)

@@ -3,34 +3,28 @@ package com.ilyabelegradek.favoritecolors.ui.viewModel
 import android.util.Log
 import android.util.Patterns
 import androidx.lifecycle.ViewModel
-import com.ilyabelegradek.favoritecolors.store.createUser
-import com.ilyabelegradek.favoritecolors.store.getColorsFromDB
-import com.ilyabelegradek.favoritecolors.store.loginUser
 import com.ilyabelegradek.favoritecolors.models.ColorToFavorite
 import com.ilyabelegradek.favoritecolors.models.DialogState
 import com.ilyabelegradek.favoritecolors.models.SortingMethod
-import com.ilyabelegradek.favoritecolors.store.observeUser
-import com.ilyabelegradek.favoritecolors.store.updateUsersFavoriteColor
-import com.ilyabelegradek.favoritecolors.store.writeCustomColor
-import com.ilyabelegradek.favoritecolors.store.writeUser
 import com.ilyabelegradek.favoritecolors.ui.state.ColorsState
-import com.google.firebase.Firebase
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.auth
-import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.database
+import com.ilyabelegradek.favoritecolors.store.AuthHelper
+import com.ilyabelegradek.favoritecolors.store.DatabaseHelper
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import javax.inject.Inject
 
 private const val TAG = "FavoriteColorsViewModel"
 
-class FavoriteColorsViewModel : ViewModel() {
+@HiltViewModel
+class FavoriteColorsViewModel @Inject constructor(
+    private val databaseHelper: DatabaseHelper,
+    private val authHelper: AuthHelper
+) : ViewModel() {
     private val _colorsState = MutableStateFlow(ColorsState())
     val colorsState: StateFlow<ColorsState> = _colorsState.asStateFlow()
-    private var database: DatabaseReference = Firebase.database.reference
-    private var auth: FirebaseAuth = Firebase.auth
     private var userListener: ValueEventListener? = null
     private var observedUid: String? = null
 
@@ -55,8 +49,8 @@ class FavoriteColorsViewModel : ViewModel() {
         } else if (colorToFavorite.color != user.favoriteColor?.color) {
             _colorsState.value =
                 _colorsState.value.copy(selectedColor = colorToFavorite, isSubmitting = true)
-            updateUsersFavoriteColor(
-                database, user, colorToFavorite, {},
+            databaseHelper.updateUsersFavoriteColor(
+                user, colorToFavorite, {},
                 {
                     _colorsState.value =
                         _colorsState.value.copy(isSubmitting = false)
@@ -100,14 +94,12 @@ class FavoriteColorsViewModel : ViewModel() {
     fun signupHandler() {
         if (validateSignupForm() && !_colorsState.value.isSubmitting) {
             _colorsState.value = _colorsState.value.copy(isSubmitting = true)
-            createUser(
-                auth,
+            authHelper.createUser(
                 email = _colorsState.value.email,
                 password = _colorsState.value.password,
                 onSignupSuccess = { firebaseUser ->
                     if (firebaseUser != null) {
-                        writeUser(
-                            database,
+                        databaseHelper.writeUser(
                             firebaseUser,
                             _colorsState.value.selectedColor,
                             onSuccess = {
@@ -137,8 +129,7 @@ class FavoriteColorsViewModel : ViewModel() {
     fun loginHandler() {
         if (validateLoginForm() && !_colorsState.value.isSubmitting) {
             _colorsState.value = _colorsState.value.copy(isSubmitting = true)
-            loginUser(
-                auth,
+            authHelper.loginUser(
                 email = _colorsState.value.email,
                 password = _colorsState.value.password,
                 onLoginSuccess = { firebaseUser ->
@@ -161,7 +152,7 @@ class FavoriteColorsViewModel : ViewModel() {
     }
 
     fun logoutHandler() {
-        auth.signOut()
+        authHelper.signOut()
         stopObservingUser()
         _colorsState.value = _colorsState.value.copy(user = null)
     }
@@ -187,8 +178,7 @@ class FavoriteColorsViewModel : ViewModel() {
             }
         }
 
-        writeCustomColor(
-            database = database,
+        databaseHelper.writeCustomColor(
             user = _colorsState.value.user,
             customColorHex = colorHex,
             onSuccess = {
@@ -212,7 +202,7 @@ class FavoriteColorsViewModel : ViewModel() {
     }
 
     private fun loadColors() {
-        getColorsFromDB(database) { favoriteColors ->
+        databaseHelper.getColorsFromDB { favoriteColors ->
             _colorsState.value = _colorsState.value.copy(
                 colorsToFavorite = getSortedColors(
                     favoriteColors,
@@ -223,7 +213,7 @@ class FavoriteColorsViewModel : ViewModel() {
     }
 
     private fun initialLogin() {
-        val currentUser = auth.currentUser
+        val currentUser = authHelper.getInitialUser()
         if (currentUser != null) {
             startObservingUser(currentUser.uid)
         }
@@ -233,7 +223,7 @@ class FavoriteColorsViewModel : ViewModel() {
         if (observedUid == uid) return
         stopObservingUser()
         observedUid = uid
-        userListener = observeUser(database, uid) { fetchedUser ->
+        userListener = databaseHelper.observeUser(uid) { fetchedUser ->
             _colorsState.value = _colorsState.value.copy(
                 user = fetchedUser,
                 isSubmitting = false
@@ -245,7 +235,7 @@ class FavoriteColorsViewModel : ViewModel() {
         val uid = observedUid
         val listener = userListener
         if (uid != null && listener != null) {
-            database.child("users").child(uid).removeEventListener(listener)
+            databaseHelper.stopObservingUser(uid, listener)
         }
         userListener = null
         observedUid = null
