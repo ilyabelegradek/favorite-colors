@@ -1,11 +1,11 @@
+# This app is a work in progress.
+
 # Privacy Policy for Favorite Colors
 
-**Last Updated:** 5/1/2026
+**Last Updated:** 5/2/2026
 
 Favorite Colors is a Jetpack Compose Kotlin app developed by Ilya Belegradek.
 Read on to learn how this app collects and uses personal data.
-
-**This app has not yet been deployed to Google Play**
 
 ### 1. Data Collection and Usage
 
@@ -30,13 +30,22 @@ other users; they cannot see which color you voted for or any of your personal i
 automatically, such as IP addresses, device identifiers, and usage diagnostics, as described in
 the [Google Privacy Policy](https://policies.google.com/privacy).
 
-**[Skydoves' Color Picker](https://github.com/skydoves/colorpicker-compose)** allows users to add a
+[Skydoves' Color Picker](https://github.com/skydoves/colorpicker-compose) allows users to add a
 new color other users can vote for. This library does not collect any user data.
 
 ### 4. Data Deletion
 
 Users have the right to request the deletion of their account and associated voting data. To request
-data deletion, please use the "Delete Account" option in the app settings.
+data deletion, please perform the following steps:
+
+1) Open the Favorite Colors app
+2) Sign in (if you're not automatically signed in)
+3) Tap the "My Account" button
+4) Tap "Delete My Account"
+5) In the confirmation dialog, tap "Yes, delete my account"
+
+Your Google account will be removed from our database and your vote for your favorite color will be
+cleared. .
 
 ### 5. Contact
 
