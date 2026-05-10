@@ -23,11 +23,12 @@ fun ColorItem(
     color: ColorToFavorite,
     viewModel: FavoriteColorsViewModel,
     isSubmitting: Boolean = false,
+    modifier: Modifier
 ) {
     val contrastColor = Color(color.contrastColor.toColorInt())
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .size(200.dp)
             .background(color = Color(color.color.toColorInt()), shape = RectangleShape)
             .clickable(enabled = !isSubmitting) {

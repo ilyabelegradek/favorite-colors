@@ -14,6 +14,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 private const val TAG = "FavoriteColorsViewModel"
@@ -43,30 +44,26 @@ class FavoriteColorsViewModel @Inject constructor(
 
         val user = _colorsState.value.user
         if (user == null) {
-            _colorsState.value =
-                _colorsState.value.copy(selectedColor = colorToFavorite)
+            _colorsState.update { it.copy(selectedColor = colorToFavorite) }
             setDialogState(DialogState.AUTH)
         } else if (colorToFavorite.color != user.favoriteColor?.color) {
-            _colorsState.value =
-                _colorsState.value.copy(selectedColor = colorToFavorite, isSubmitting = true)
+            _colorsState.update { it.copy(selectedColor = colorToFavorite, isSubmitting = true) }
             databaseHelper.updateUsersFavoriteColor(
                 user, colorToFavorite, {},
                 {
-                    _colorsState.value =
-                        _colorsState.value.copy(isSubmitting = false)
+                    _colorsState.update { it.copy(isSubmitting = false) }
                 })
         }
     }
 
     fun setDialogState(dialogState: DialogState) {
-        _colorsState.value =
-            _colorsState.value.copy(dialogState = dialogState)
+        _colorsState.update { it.copy(dialogState = dialogState) }
     }
 
     fun setSignupTab(selected: Boolean) {
         val defaultAuthMessage = if (selected) "Sign up to cast your vote!" else ""
-        _colorsState.value =
-            _colorsState.value.copy(
+        _colorsState.update {
+            it.copy(
                 signUpTab = selected,
                 email = "",
                 password = "",
@@ -74,26 +71,24 @@ class FavoriteColorsViewModel @Inject constructor(
                 authDialogMessage = defaultAuthMessage,
                 authDialogError = false
             )
+        }
     }
 
     fun updateEmail(enteredEmail: String) {
-        _colorsState.value =
-            _colorsState.value.copy(email = enteredEmail.trim())
+        _colorsState.update { it.copy(email = enteredEmail.trim()) }
     }
 
     fun updatePassword(enteredPassword: String) {
-        _colorsState.value =
-            _colorsState.value.copy(password = enteredPassword.trim())
+        _colorsState.update { it.copy(password = enteredPassword.trim()) }
     }
 
     fun updateConfirmPassword(enteredConfirmPassword: String) {
-        _colorsState.value =
-            _colorsState.value.copy(confirmPassword = enteredConfirmPassword.trim())
+        _colorsState.update { it.copy(confirmPassword = enteredConfirmPassword.trim()) }
     }
 
     fun signupHandler() {
         if (validateSignupForm() && !_colorsState.value.isSubmitting) {
-            _colorsState.value = _colorsState.value.copy(isSubmitting = true)
+            _colorsState.update { it.copy(isSubmitting = true) }
             authHelper.createUser(
                 email = _colorsState.value.email,
                 password = _colorsState.value.password,
@@ -107,28 +102,30 @@ class FavoriteColorsViewModel @Inject constructor(
                                 setDialogState(DialogState.NONE)
                             },
                             onFailure = {
-                                _colorsState.value = _colorsState.value.copy(isSubmitting = false)
+                                _colorsState.update { it.copy(isSubmitting = false) }
                                 setDialogState(DialogState.NONE)
                             })
                     } else {
                         Log.w(TAG, "onSignupSuccess but user came back null.")
-                        _colorsState.value = _colorsState.value.copy(isSubmitting = false)
+                        _colorsState.update { it.copy(isSubmitting = false) }
                         setDialogState(DialogState.NONE)
                     }
                 },
                 onSignupFailure = { errorMessage ->
-                    _colorsState.value = _colorsState.value.copy(
-                        authDialogError = true,
-                        authDialogMessage = errorMessage,
-                        isSubmitting = false
-                    )
+                    _colorsState.update {
+                        it.copy(
+                            authDialogError = true,
+                            authDialogMessage = errorMessage,
+                            isSubmitting = false
+                        )
+                    }
                 })
         }
     }
 
     fun loginHandler() {
         if (validateLoginForm() && !_colorsState.value.isSubmitting) {
-            _colorsState.value = _colorsState.value.copy(isSubmitting = true)
+            _colorsState.update { it.copy(isSubmitting = true) }
             authHelper.loginUser(
                 email = _colorsState.value.email,
                 password = _colorsState.value.password,
@@ -137,16 +134,18 @@ class FavoriteColorsViewModel @Inject constructor(
                         startObservingUser(firebaseUser.uid)
                         setDialogState(DialogState.NONE)
                     } else {
-                        _colorsState.value = _colorsState.value.copy(isSubmitting = false)
+                        _colorsState.update { it.copy(isSubmitting = false) }
                         setDialogState(DialogState.NONE)
                     }
                 },
                 onLoginFailure = { errorMessage ->
-                    _colorsState.value = _colorsState.value.copy(
-                        authDialogError = true,
-                        authDialogMessage = errorMessage,
-                        isSubmitting = false
-                    )
+                    _colorsState.update {
+                        it.copy(
+                            authDialogError = true,
+                            authDialogMessage = errorMessage,
+                            isSubmitting = false
+                        )
+                    }
                 })
         }
     }
@@ -154,26 +153,25 @@ class FavoriteColorsViewModel @Inject constructor(
     fun logoutHandler() {
         authHelper.signOut()
         stopObservingUser()
-        _colorsState.value = _colorsState.value.copy(user = null)
+        _colorsState.update { it.copy(user = null) }
     }
 
     fun setSortingMethod(sortingMethod: SortingMethod) {
-        val currentState = _colorsState.value
-        val sortedColors = getSortedColors(currentState.colorsToFavorite, sortingMethod)
+        val sortedColors = getSortedColors(_colorsState.value.colorsToFavorite, sortingMethod)
 
-        _colorsState.value = currentState.copy(
-            selectedSortingMethod = sortingMethod,
-            dialogState = DialogState.NONE,
-            colorsToFavorite = sortedColors
-        )
+        _colorsState.update {
+            it.copy(
+                selectedSortingMethod = sortingMethod,
+                dialogState = DialogState.NONE,
+                colorsToFavorite = sortedColors
+            )
+        }
     }
 
     fun saveCustomColor(colorHex: String) {
         for (color in _colorsState.value.colorsToFavorite) {
             if (color.color == colorHex) {
-                _colorsState.value = _colorsState.value.copy(
-                    colorPickerDialogMessage = "Color already exists! Please vote for it below.",
-                )
+                _colorsState.update { it.copy(colorPickerDialogMessage = "Color already exists! Please vote for it below.") }
                 return
             }
         }
@@ -182,9 +180,7 @@ class FavoriteColorsViewModel @Inject constructor(
             user = _colorsState.value.user,
             customColorHex = colorHex,
             onSuccess = {
-                _colorsState.value = _colorsState.value.copy(
-                    dialogState = DialogState.NONE,
-                )
+                _colorsState.update { it.copy(dialogState = DialogState.NONE) }
             },
             onFailure = {})
     }
@@ -203,12 +199,11 @@ class FavoriteColorsViewModel @Inject constructor(
 
     private fun loadColors() {
         databaseHelper.getColorsFromDB { favoriteColors ->
-            _colorsState.value = _colorsState.value.copy(
-                colorsToFavorite = getSortedColors(
-                    favoriteColors,
-                    _colorsState.value.selectedSortingMethod
-                )
+            val sortedColors = getSortedColors(
+                favoriteColors,
+                _colorsState.value.selectedSortingMethod
             )
+            _colorsState.update { it.copy(colorsToFavorite = sortedColors) }
         }
     }
 
@@ -224,10 +219,7 @@ class FavoriteColorsViewModel @Inject constructor(
         stopObservingUser()
         observedUid = uid
         userListener = databaseHelper.observeUser(uid) { fetchedUser ->
-            _colorsState.value = _colorsState.value.copy(
-                user = fetchedUser,
-                isSubmitting = false
-            )
+            _colorsState.update { it.copy(user = fetchedUser, isSubmitting = false) }
         }
     }
 
@@ -242,26 +234,31 @@ class FavoriteColorsViewModel @Inject constructor(
     }
 
     private fun validateSignupForm(): Boolean {
-        _colorsState.value = _colorsState.value.copy(
-            authDialogMessage = "",
-            authDialogError = false
-        )
+        _colorsState.update { it.copy(authDialogMessage = "", authDialogError = false) }
 
         if (!isEmailValid()) {
-            _colorsState.value =
-                _colorsState.value.copy(authDialogMessage = "Invalid email", authDialogError = true)
+            _colorsState.update {
+                it.copy(
+                    authDialogMessage = "Invalid email",
+                    authDialogError = true
+                )
+            }
             return false
         } else if (!isPasswordValid()) {
-            _colorsState.value = _colorsState.value.copy(
-                authDialogMessage = "Password must be at least 8 characters and contain at least one uppercase letter and special character.",
-                authDialogError = true
-            )
+            _colorsState.update {
+                it.copy(
+                    authDialogMessage = "Password must be at least 8 characters and contain at least one uppercase letter and special character.",
+                    authDialogError = true
+                )
+            }
             return false
         } else if (!isPasswordsMatching()) {
-            _colorsState.value = _colorsState.value.copy(
-                authDialogMessage = "Passwords do not match.",
-                authDialogError = true
-            )
+            _colorsState.update {
+                it.copy(
+                    authDialogMessage = "Passwords do not match.",
+                    authDialogError = true
+                )
+            }
             return false
         }
 
@@ -269,20 +266,23 @@ class FavoriteColorsViewModel @Inject constructor(
     }
 
     private fun validateLoginForm(): Boolean {
-        _colorsState.value = _colorsState.value.copy(
-            authDialogMessage = "",
-            authDialogError = false
-        )
+        _colorsState.update { it.copy(authDialogMessage = "", authDialogError = false) }
 
         if (!isEmailValid()) {
-            _colorsState.value =
-                _colorsState.value.copy(authDialogMessage = "Invalid email", authDialogError = true)
+            _colorsState.update {
+                it.copy(
+                    authDialogMessage = "Invalid email",
+                    authDialogError = true
+                )
+            }
             return false
         } else if (!isPasswordValid()) {
-            _colorsState.value = _colorsState.value.copy(
-                authDialogMessage = "Password must be at least 8 characters and contain at least one uppercase letter and special character.",
-                authDialogError = true
-            )
+            _colorsState.update {
+                it.copy(
+                    authDialogMessage = "Password must be at least 8 characters and contain at least one uppercase letter and special character.",
+                    authDialogError = true
+                )
+            }
             return false
         }
 
